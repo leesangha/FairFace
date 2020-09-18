@@ -15,7 +15,7 @@ if __name__ == "__main__":
     f_id = str(uuid.uuid4())
     SAVE_DETECTED_AT = "detected_faces/" + f_id
     predict.ensure_dir(SAVE_DETECTED_AT)  # 디렉토리 생성
-    nas = "detected_faces/race_Asian.jpg"
+    nas = "detected_faces/race_Asian_face0.jpg"
     imgs = [nas]
     print(nas)
     predict.detect_face(imgs, SAVE_DETECTED_AT, cnn_face_detector, sp)
