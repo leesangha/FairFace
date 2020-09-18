@@ -1,27 +1,46 @@
 from __future__ import print_function, division
+import argparse
+import os
+import dlib
+from torchvision import datasets, models, transforms
+import torchvision
+import numpy as np
+import torch.nn as nn
+import torch
+import pandas as pd
+import os.path
 import warnings
 warnings.filterwarnings("ignore")
-import os.path
-import pandas as pd
-import torch
-import torch.nn as nn
-import numpy as np
-import torchvision
-from torchvision import datasets, models, transforms
-import dlib
-import os
-import argparse
 
-def detect_face(image_paths,  SAVE_DETECTED_AT, size = 300, padding = 0.25):
-    cnn_face_detector = dlib.cnn_face_detection_model_v1('dlib_models/mmod_human_face_detector.dat')
-    sp = dlib.shape_predictor('dlib_models/shape_predictor_5_face_landmarks.dat')
+
+def rect_to_bb(rect):
+    # take a bounding predicted by dlib and convert it
+    # to the format (x, y, w, h) as we would normally do
+    # with OpenCV
+    x = rect.left()
+    y = rect.top()
+    w = rect.right() - x
+    h = rect.bottom() - y
+    # return a tuple of (x, y, w, h)
+    return (x, y, w, h)
+
+
+def detect_face(image_paths,  SAVE_DETECTED_AT, cnn_face_detector, sp, default_max_size=800, size=300, padding=0.25):
+
     base = 2000  # largest width and height
     for index, image_path in enumerate(image_paths):
         if index % 1000 == 0:
-            print('---%d/%d---' %(index, len(image_paths)))
-
+            print('---%d/%d---' % (index, len(image_paths)))
         img = dlib.load_rgb_image(image_path)
-        img = dlib.resize_image(img, 628, 628)
+        old_width, old_height, _ = img.shape
+        if old_width > old_height:
+            new_width, new_height = default_max_size, int(
+                default_max_size * old_height / old_width)
+        else:
+            new_width, new_height = int(
+                default_max_size * old_height / old_width), default_max_size
+        new_width, new_height = 628, int(628 * old_height / old_width)
+        img = dlib.resize_image(img, new_width, new_height)
         dets = cnn_face_detector(img, 1)
         num_faces = len(dets)
         if num_faces == 0:
@@ -32,26 +51,30 @@ def detect_face(image_paths,  SAVE_DETECTED_AT, size = 300, padding = 0.25):
         for detection in dets:
             rect = detection.rect
             faces.append(sp(img, rect))
-        images = dlib.get_face_chips(img, faces, size=size, padding = padding)
+        images = dlib.get_face_chips(img, faces, size=size, padding=padding)
         for idx, image in enumerate(images):
             img_name = image_path.split("/")[-1]
             path_sp = img_name.split(".")
-            face_name = os.path.join(SAVE_DETECTED_AT,  path_sp[0] + "_" + "face" + str(idx) + "." + path_sp[-1])
+            face_name = os.path.join(
+                SAVE_DETECTED_AT,  path_sp[0] + "_" + "face" + str(idx) + "." + path_sp[-1])
             dlib.save_image(image, face_name)
 
-def predidct_age_gender_race(save_prediction_at, imgs_path = 'cropped_faces/'):
+
+def predidct_age_gender_race(save_prediction_at, imgs_path='cropped_faces/'):
     img_names = [os.path.join(imgs_path, x) for x in os.listdir(imgs_path)]
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     model_fair_7 = torchvision.models.resnet34(pretrained=True)
     model_fair_7.fc = nn.Linear(model_fair_7.fc.in_features, 18)
-    model_fair_7.load_state_dict(torch.load('fair_face_models/res34_fair_align_multi_7_20190809.pt'))
+    model_fair_7.load_state_dict(torch.load(
+        'fair_face_models/res34_fair_align_multi_7_20190809.pt'))
     model_fair_7 = model_fair_7.to(device)
     model_fair_7.eval()
 
     model_fair_4 = torchvision.models.resnet34(pretrained=True)
     model_fair_4.fc = nn.Linear(model_fair_4.fc.in_features, 18)
-    model_fair_4.load_state_dict(torch.load('fair_face_models/fairface_alldata_4race_20191111.pt'))
+    model_fair_4.load_state_dict(torch.load(
+        'fair_face_models/fairface_alldata_4race_20191111.pt'))
     model_fair_4 = model_fair_4.to(device)
     model_fair_4.eval()
 
@@ -59,7 +82,8 @@ def predidct_age_gender_race(save_prediction_at, imgs_path = 'cropped_faces/'):
         transforms.ToPILImage(),
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                             0.229, 0.224, 0.225])
     ])
     # img pth of face images
     face_names = []
@@ -80,7 +104,8 @@ def predidct_age_gender_race(save_prediction_at, imgs_path = 'cropped_faces/'):
         face_names.append(img_name)
         image = dlib.load_rgb_image(img_name)
         image = trans(image)
-        image = image.view(1, 3, 224, 224)  # reshape image to match model dimensions (1 batch size)
+        # reshape image to match model dimensions (1 batch size)
+        image = image.view(1, 3, 224, 224)
         image = image.to(device)
 
         # fair
@@ -181,7 +206,6 @@ def ensure_dir(directory):
         os.makedirs(directory)
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--csv', dest='input_csv', action='store',
@@ -191,6 +215,10 @@ if __name__ == "__main__":
     SAVE_DETECTED_AT = "detected_faces"
     ensure_dir(SAVE_DETECTED_AT)
     imgs = pd.read_csv(args.input_csv)['img_path']
-    detect_face(imgs, SAVE_DETECTED_AT)
+    cnn_face_detector = dlib.cnn_face_detection_model_v1(
+        'dlib_models/mmod_human_face_detector.dat')
+    sp = dlib.shape_predictor(
+        'dlib_models/shape_predictor_5_face_landmarks.dat')
+    detect_face(imgs, SAVE_DETECTED_AT, cnn_face_detector, sp)
     print("detected faces are saved at ", SAVE_DETECTED_AT)
     predidct_age_gender_race("test_outputs.csv", SAVE_DETECTED_AT)
