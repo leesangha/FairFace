@@ -8,13 +8,10 @@ import threading
 import time
 from queue import Empty, Queue
 
-import cv2
 from flask import Flask, render_template, flash, send_file, request, jsonify, url_for
-from PIL import Image
 import numpy as np
-
-from werkzeug.utils import secure_filename
-import predict
+import dlib
+from predict import detect_face, predidct_age_gender_race
 #################################################################
 app = Flask(__name__, template_folder="templates", static_url_path="/static")
 
@@ -44,11 +41,12 @@ def run(input_file, file_type, f_path):
             input_file.save(save_path)
             # Run model
             imgs = [save_path]
-            predict.detected_face(imgs, f_path, cnn_face_detector, sp)
+            detect_face(imgs, f_path, cnn_face_detector, sp)
+            print('detect_face end')
             os.remove(save_path)  # 삭제
             if os.path.isfile(save_path):
                 print('notremoved : ' + save_path)
-            predict.predict_age_gender_race("test_outputs.csv", f_path)
+            predidct_age_gender_race("test_outputs.csv", f_path)
 
             # 디렉토리에 jpg,png 또는 png하나 생김
 
@@ -136,13 +134,14 @@ def predict():
 
         result_path = req["output"]
         # 여기서 나이 인종 값 정리해서 보내면 된다
-
+        print('result_path === ' + result_path)
         shutil.rmtree(f_path)
-        output_file = open(result_path, "r")
-        f_read = f.read()
-        split = f_read.split(",")
-        result = [split[9], split[10], split[11], split[12]]
-        return result
+
+        f = open("test_outputs.csv", "r")
+        read = f.read()
+        split = read.split(",")
+        result = split[9] + ' ' + split[10] + ' ' + split[11] + ' ' + split[12]
+        return jsonify(race7=split[9], race4=split[10], gender=split[11], age=split[12])
 
     except Exception as e:
         print(e)
