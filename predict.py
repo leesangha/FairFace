@@ -25,7 +25,7 @@ def rect_to_bb(rect):
     return (x, y, w, h)
 
 
-def detect_face(image_paths,  SAVE_DETECTED_AT, cnn_face_detector, sp, default_max_size=800, size=300, padding=0.25):
+def detect_face(image_paths, SAVE_DETECTED_AT, cnn_face_detector, sp, default_max_size=800, size=300, padding=0.25):
 
     base = 2000  # largest width and height
     for index, image_path in enumerate(image_paths):
@@ -63,8 +63,9 @@ def detect_face(image_paths,  SAVE_DETECTED_AT, cnn_face_detector, sp, default_m
 def predidct_age_gender_race(save_prediction_at, imgs_path='cropped_faces/'):
     img_names = [os.path.join(imgs_path, x) for x in os.listdir(imgs_path)]
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-    model_fair_7 = torchvision.models.resnet34(pretrained=True)
+    print('check')
+    model_fair_7 = torchvision.models.resnet34(pretrained=True, progress=True)
+    print('check1')
     model_fair_7.fc = nn.Linear(model_fair_7.fc.in_features, 18)
     model_fair_7.load_state_dict(torch.load(
         'fair_face_models/res34_fair_align_multi_7_20190809.pt'))
