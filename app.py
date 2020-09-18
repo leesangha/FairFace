@@ -13,8 +13,8 @@ from flask import Flask, render_template, flash, send_file, request, jsonify, ur
 from PIL import Image
 import numpy as np
 
-from u2net_test import U_2net
 from werkzeug.utils import secure_filename
+import predict
 #################################################################
 app = Flask(__name__, template_folder="templates", static_url_path="/static")
 
@@ -27,6 +27,9 @@ BATCH_SIZE = 1
 CHECK_INTERVAL = 0.1
 ##################################################################
 # pre-train
+cnn_face_detector = dlib.cnn_face_detection_model_v1(
+    'dlib_models/mmod_human_face_detector.dat')
+sp = dlib.shape_predictor('dlib_models/shape_predictor_5_face_landmarks.dat')
 # run
 
 
@@ -35,17 +38,22 @@ def run(input_file, file_type, f_path):
         if file_type == "image":
             f_name = str(uuid.uuid4())
             save_path = f_path + '/' + f_name + '.jpg'
+            file_name = f_name+'.jpg'
 
             # Original Image Save
             input_file.save(save_path)
             # Run model
-            image_list = U_2net.getData(f_path)
-            loader = U_2net.getLoader(image_list)
-            U_2net.run(image_list, loader, net, f_path)
+            imgs = [save_path]
+            predict.detected_face(imgs, f_path, cnn_face_detector, sp)
+            os.remove(save_path)  # 삭제
+            if os.path.isfile(save_path):
+                print('notremoved : ' + save_path)
+            predict.predict_age_gender_race("test_outputs.csv", f_path)
+
             # 디렉토리에 jpg,png 또는 png하나 생김
 
             # return result_path
-            result_path = f_path + '/' + f_name + '.png'
+            result_path = 'test_outputs.csv'
 
             return result_path
 
@@ -127,19 +135,19 @@ def predict():
             return jsonify({"error": "Error! Please upload another file"}), 500
 
         result_path = req["output"]
-
-        result = send_file(result_path)
+        # 여기서 나이 인종 값 정리해서 보내면 된다
 
         shutil.rmtree(f_path)
-
+        output_file = open(result_path, "r")
+        f_read = f.read()
+        split = f_read.split(",")
+        result = [split[9], split[10], split[11], split[12]]
         return result
 
     except Exception as e:
         print(e)
 
         return jsonify({"message": "Error! Please upload another file"}), 400
-
-    return render_template("hi.html")
 
 
 @app.route("/health")
