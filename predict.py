@@ -81,6 +81,8 @@ def make_model4():
     return model_fair_4
 def predidct_age_gender_race(save_prediction_at,imgs_path,model_fair_7,model_fair_4):
     img_names = [os.path.join(imgs_path, x) for x in os.listdir(imgs_path)]
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
     trans = transforms.Compose([
         transforms.ToPILImage(),
         transforms.Resize((224, 224)),
