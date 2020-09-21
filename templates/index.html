@@ -76,9 +76,12 @@
           <div id="space">
             <!-- preview space-->
           </div>
-          <div id="text">
+          <div id="text" style="display:none; margin-top: 10em; margin-left: 10em;">
             <div>
-              <span>asdf</span>
+              <div id="race7">Race7 :</div>
+              <div id="race4">Race4 :</div>
+              <div id="gender">Gender :</div>
+              <div id="age">Age :</div>
             </div>
           </div>
           <br />
@@ -248,6 +251,13 @@
             .then((data) => {
               document.getElementById("submit").disabled = false;
               document.getElementById("source").disabled = false;
+              document.getElementById("text").style.display = "";
+
+              document.getElementById("race7").innerHTML = "Race7  : " + data.race7;
+              document.getElementById("race4").innerHTML = "Race4  : " + data.race4;
+              document.getElementById("gender").innerHTML = "Gender  : " + data.gender;
+              document.getElementById("age").innerHTML = "Age   : " + data.age;
+
               console.log(data.race7);
               console.log(data.race4);
               console.log(data.gender);
