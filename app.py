@@ -17,8 +17,8 @@ app = Flask(__name__, template_folder="templates", static_url_path="/static")
 
 DATA_FOLDER = "detected_faces"
 # Init Cartoonizer and load its weights
-model_7=predict.make_model7()
-model_4=predict.make_model4()
+model_7=make_model7()
+model_4=make_model4()
 
 requests_queue = Queue()
 BATCH_SIZE = 1
