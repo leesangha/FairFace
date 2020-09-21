@@ -17,20 +17,12 @@ if __name__ == "__main__":
     predict.ensure_dir(SAVE_DETECTED_AT)  # 디렉토리 생성
     nas = "detected_faces/race_Asian_face0.jpg"
     imgs = [nas]
-    print(nas)
     predict.detect_face(imgs, SAVE_DETECTED_AT, cnn_face_detector, sp)
-    print("detected faces are saved at ", SAVE_DETECTED_AT)
-    predict.predidct_age_gender_race("test_outputs.csv", SAVE_DETECTED_AT)
-    print('end')
-    """
-    """
-
-    """
-    f_id = str(uuid.uuid4())
-    SAVE_DETECTED_AT="detected_faces/" + f_id
-    print(SAVE_DETECTED_AT)
-    imgs = ["test/race_Asian.jpg"]
-    """
+    #print("detected faces are saved at ", SAVE_DETECTED_AT)
+    model_7= predict.make_model7()
+    model_4= predict.make_model4()
+    predict.predidct_age_gender_race("test_outputs.csv", SAVE_DETECTED_AT,model_7,model_4)
+    #print('end')
 
     f = open("test_outputs.csv", "r")
     read = f.read()

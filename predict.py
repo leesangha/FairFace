@@ -60,32 +60,34 @@ def detect_face(image_paths, SAVE_DETECTED_AT, cnn_face_detector, sp, default_ma
             dlib.save_image(image, face_name)
 
 
-def predidct_age_gender_race(save_prediction_at, imgs_path='cropped_faces/'):
-    img_names = [os.path.join(imgs_path, x) for x in os.listdir(imgs_path)]
+def make_model7():
+    
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print('check')
     model_fair_7 = torchvision.models.resnet34(pretrained=True, progress=True)
     print('check1')
     model_fair_7.fc = nn.Linear(model_fair_7.fc.in_features, 18)
-    model_fair_7.load_state_dict(torch.load(
-        'fair_face_models/res34_fair_align_multi_7_20190809.pt'))
+    model_fair_7.load_state_dict(torch.load('fair_face_models/res34_fair_align_multi_7_20190809.pt'))
     model_fair_7 = model_fair_7.to(device)
     model_fair_7.eval()
-
+    return model_fair_7
+def make_model4():
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model_fair_4 = torchvision.models.resnet34(pretrained=True)
     model_fair_4.fc = nn.Linear(model_fair_4.fc.in_features, 18)
-    model_fair_4.load_state_dict(torch.load(
-        'fair_face_models/fairface_alldata_4race_20191111.pt'))
+    model_fair_4.load_state_dict(torch.load('fair_face_models/fairface_alldata_4race_20191111.pt'))
     model_fair_4 = model_fair_4.to(device)
     model_fair_4.eval()
-
+    return model_fair_4
+def predidct_age_gender_race(save_prediction_at,imgs_path,model_fair_7,model_fair_4):
+    img_names = [os.path.join(imgs_path, x) for x in os.listdir(imgs_path)]
     trans = transforms.Compose([
         transforms.ToPILImage(),
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
                              0.229, 0.224, 0.225])
-    ])
+    ])    
     # img pth of face images
     face_names = []
     # list within a list. Each sublist contains scores for all races. Take max for predicted race

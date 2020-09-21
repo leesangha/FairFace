@@ -4,4 +4,4 @@ torchvision
 numpy
 waitress==1.4.4
 pandas
-pillow
+Pillow

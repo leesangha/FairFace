@@ -11,13 +11,14 @@ from queue import Empty, Queue
 from flask import Flask, render_template, flash, send_file, request, jsonify, url_for
 import numpy as np
 import dlib
-from predict import detect_face, predidct_age_gender_race
+from predict import detect_face, predidct_age_gender_race, make_model7,make_model4
 #################################################################
 app = Flask(__name__, template_folder="templates", static_url_path="/static")
 
 DATA_FOLDER = "detected_faces"
 # Init Cartoonizer and load its weights
-
+model_7=predict.make_model7()
+model_4=predict.make_model4()
 
 requests_queue = Queue()
 BATCH_SIZE = 1
@@ -46,8 +47,7 @@ def run(input_file, file_type, f_path):
             os.remove(save_path)  # 삭제
             if os.path.isfile(save_path):
                 print('notremoved : ' + save_path)
-            predidct_age_gender_race("test_outputs.csv", f_path)
-
+            predidct_age_gender_race("test_outputs.csv",f_path ,model_7,model_4)
             # 디렉토리에 jpg,png 또는 png하나 생김
 
             # return result_path
