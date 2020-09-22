@@ -41,7 +41,7 @@
 
       <h2>How to Use</h2>
       <div id="usage" style="margin-top: 5px; margin-bottom: 5px">
-        <p>1. Name the image file in English or Numbers. (e.g. julia.jpeg)</p>
+        <p>1. Name the image file in English or Numbers. </p>
         <p>
           2. Upload the image file you want to convert.(Only one person , Not
           multiple people)
@@ -219,7 +219,7 @@
             } else if (
               document.getElementById("source").files[0].size /
               (1000 * 1000) >
-              35
+              10
             ) {
               throw Error("Please upload a file smaller than 35MB");
             }
@@ -235,9 +235,9 @@
           formData.append("source", source);
           formData.append("file_type", file_type);
           fetch("/predict", {
-            method: "POST",
-            body: formData,
-          })
+              method: "POST",
+              body: formData,
+            })
             .then(async (response) => {
               if (response.status == 200) {
                 return response;
