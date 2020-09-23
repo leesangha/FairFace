@@ -61,25 +61,31 @@ def detect_face(image_paths, SAVE_DETECTED_AT, cnn_face_detector, sp, default_ma
 
 
 def make_model7():
-    
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print('check')
     model_fair_7 = torchvision.models.resnet34(pretrained=True, progress=True)
     print('check1')
     model_fair_7.fc = nn.Linear(model_fair_7.fc.in_features, 18)
-    model_fair_7.load_state_dict(torch.load('fair_face_models/res34_fair_align_multi_7_20190809.pt'))
+    model_fair_7.load_state_dict(torch.load(
+        'fair_face_models/res34_fair_align_multi_7_20190809.pt'))
     model_fair_7 = model_fair_7.to(device)
     model_fair_7.eval()
     return model_fair_7
+
+
 def make_model4():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model_fair_4 = torchvision.models.resnet34(pretrained=True)
     model_fair_4.fc = nn.Linear(model_fair_4.fc.in_features, 18)
-    model_fair_4.load_state_dict(torch.load('fair_face_models/fairface_alldata_4race_20191111.pt'))
+    model_fair_4.load_state_dict(torch.load(
+        'fair_face_models/fairface_alldata_4race_20191111.pt'))
     model_fair_4 = model_fair_4.to(device)
     model_fair_4.eval()
     return model_fair_4
-def predidct_age_gender_race(save_prediction_at,imgs_path,model_fair_7,model_fair_4):
+
+
+def predidct_age_gender_race(save_prediction_at, imgs_path, model_fair_7, model_fair_4):
     img_names = [os.path.join(imgs_path, x) for x in os.listdir(imgs_path)]
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -89,7 +95,7 @@ def predidct_age_gender_race(save_prediction_at,imgs_path,model_fair_7,model_fai
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
                              0.229, 0.224, 0.225])
-    ])    
+    ])
     # img pth of face images
     face_names = []
     # list within a list. Each sublist contains scores for all races. Take max for predicted race
@@ -197,13 +203,25 @@ def predidct_age_gender_race(save_prediction_at,imgs_path,model_fair_7,model_fai
     result.loc[result['age_preds_fair'] == 7, 'age'] = '60-69'
     result.loc[result['age_preds_fair'] == 8, 'age'] = '70+'
 
+    """
     result[['face_name_align',
             'race', 'race4',
             'gender', 'age',
             'race_scores_fair', 'race_scores_fair_4',
             'gender_scores_fair', 'age_scores_fair']].to_csv(save_prediction_at, index=False)
+    """
 
-    print("saved results at ", save_prediction_at)
+    race = result[['race']].values.tolist()[0][0]
+    race4 = result[['race4']].values.tolist()[0][0]
+    gender = result[['gender']].values.tolist()[0][0]
+    age = result[['age']].values.tolist()[0][0]
+
+    # print(race)
+    # print(race4)
+    # print(gender)
+    # print(age)
+    return ','.join([race, race4, gender, age])
+    #print("saved results at ", save_prediction_at)
 
 
 def ensure_dir(directory):
