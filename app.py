@@ -11,14 +11,14 @@ from queue import Empty, Queue
 from flask import Flask, render_template, flash, send_file, request, jsonify, url_for
 import numpy as np
 import dlib
-from predict import detect_face, predidct_age_gender_race, make_model7,make_model4
+from predict import detect_face, predidct_age_gender_race, make_model7, make_model4
 #################################################################
 app = Flask(__name__, template_folder="templates", static_url_path="/static")
 
 DATA_FOLDER = "detected_faces"
 # Init Cartoonizer and load its weights
-model_7=make_model7()
-model_4=make_model4()
+model_7 = make_model7()
+model_4 = make_model4()
 
 requests_queue = Queue()
 BATCH_SIZE = 1
@@ -47,13 +47,11 @@ def run(input_file, file_type, f_path):
             os.remove(save_path)  # 삭제
             if os.path.isfile(save_path):
                 print('notremoved : ' + save_path)
-            predidct_age_gender_race("test_outputs.csv",f_path ,model_7,model_4)
+            arr = predidct_age_gender_race(
+                "test_outputs.csv", f_path, model_7, model_4)
             # 디렉토리에 jpg,png 또는 png하나 생김
-
-            # return result_path
-            result_path = 'test_outputs.csv'
-
-            return result_path
+            print(arr)
+            return arr
 
     except Exception as e:
         print(e)
@@ -132,16 +130,13 @@ def predict():
         if req["output"] == 500:
             return jsonify({"error": "Error! Please upload another file"}), 500
 
-        result_path = req["output"]
+        result = req["output"]
         # 여기서 나이 인종 값 정리해서 보내면 된다
-        print('result_path === ' + result_path)
+        print('result === ' + result)
         shutil.rmtree(f_path)
-
-        f = open("test_outputs.csv", "r")
-        read = f.read()
-        split = read.split(",")
-        result = split[9] + ' ' + split[10] + ' ' + split[11] + ' ' + split[12]
-        return jsonify(race7=split[9], race4=split[10], gender=split[11], age=split[12])
+        array = result.split(",")
+        print(array[0])
+        return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3])
 
     except Exception as e:
         print(e)
