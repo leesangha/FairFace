@@ -136,7 +136,7 @@ def predict():
         shutil.rmtree(f_path)
         array = result.split(",")
         print(array[0])
-        return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3])
+        return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3]), 200
 
     except Exception as e:
         print(e)
