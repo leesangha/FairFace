@@ -30,7 +30,7 @@ def detect_face(image_paths, SAVE_DETECTED_AT, cnn_face_detector, sp, default_ma
     base = 2000  # largest width and height
     for index, image_path in enumerate(image_paths):
         if index % 1000 == 0:
-            print('---%d/%d---' % (index, len(image_paths)))
+            print('---%d/%d--- detect_face start' % (index, len(image_paths)))
         img = dlib.load_rgb_image(image_path)
         old_width, old_height, _ = img.shape
         if old_width > old_height:
