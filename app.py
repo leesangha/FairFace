@@ -139,7 +139,7 @@ def predict():
 
         req = {"input": [input_file, file_type, f_path]}
         requests_queue.put(req)
-        print(requests_queue.qsize())
+        #print(requests_queue.qsize())
         print('push queue')
         # Thread output response
         while "output" not in req:
