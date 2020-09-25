@@ -1,0 +1,50 @@
+openapi: 3.0.1
+
+info:
+  title: FairFace
+  description: "Face Attribute Dataset for Balanced Race, Gender, and Age"
+  contact:
+    name: Ainizer - Sangha Lee
+  version: "0.1"
+  license:
+    name: "CC BY 4.0"
+    url: https://github.com/leesangha/FairFace#Data
+
+servers:
+  - url: https://master-fair-face-leesangha.endpoint.ainize.ai/
+
+paths:
+  /predict:
+    post:
+      requestBody:
+        required: true
+        description: "Face Attribute Dataset for Balanced Race, Gender, and Age"
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file_type:
+                  type: string
+                  enum: [image]
+                source:
+                  type: string
+                  format: binary
+            encoding:
+              files:
+                contentType: image/*
+
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                format: binary
+                example: {"age":"0-2","gender": "Male","race4":"Asian","race7":"East Asian"}
+        "400":
+          description: Bad Request
+
+        "500":
+          description: Server side error
