@@ -47,7 +47,7 @@ def run(input_file, file_type, f_path):
         imgs = [save_path]
         detect_face(imgs, f_path, cnn_face_detector, sp)
         print('detect_face end')
-        #time.sleep(10)
+        time.sleep(1)
         
         os.remove(save_path)  # 삭제
         if os.path.isfile(save_path):
