@@ -23,6 +23,7 @@ model_4 = make_model4()
 requests_queue = Queue()
 BATCH_SIZE = 1
 CHECK_INTERVAL = 0.1
+signal =0
 ##################################################################
 # pre-train
 cnn_face_detector = dlib.cnn_face_detection_model_v1(
@@ -30,28 +31,33 @@ cnn_face_detector = dlib.cnn_face_detection_model_v1(
 sp = dlib.shape_predictor('dlib_models/shape_predictor_5_face_landmarks.dat')
 # run
 
-
 def run(input_file, file_type, f_path):
     try:
-        if file_type == "image":
-            f_name = str(uuid.uuid4())
-            save_path = f_path + '/' + f_name + '.jpg'
-            file_name = f_name+'.jpg'
+        global signal
+        signal = 1
+        #print('run start')
+        #print(requests_queue.qsize())
+        f_name = str(uuid.uuid4())
+        save_path = f_path + '/' + f_name + '.jpg'
+        file_name = f_name+'.jpg'
 
-            # Original Image Save
-            input_file.save(save_path)
-            # Run model
-            imgs = [save_path]
-            detect_face(imgs, f_path, cnn_face_detector, sp)
-            print('detect_face end')
-            os.remove(save_path)  # 삭제
-            if os.path.isfile(save_path):
-                print('notremoved : ' + save_path)
-            arr = predidct_age_gender_race(
-                "test_outputs.csv", f_path, model_7, model_4)
-            # 디렉토리에 jpg,png 또는 png하나 생김
-            # print(arr)
-            return arr
+        # Original Image Save
+        input_file.save(save_path)
+        # Run model
+        imgs = [save_path]
+        detect_face(imgs, f_path, cnn_face_detector, sp)
+        print('detect_face end')
+        time.sleep(1)
+        
+        os.remove(save_path)  # 삭제
+        if os.path.isfile(save_path):
+           print('notremoved : ' + save_path)
+
+        arr = predidct_age_gender_race(
+           "test_outputs.csv", f_path, model_7, model_4)
+        # print(arr)
+        #arr = ','.join(['east Asian','asia','male','10-18'])
+        return arr
 
     except Exception as e:
         print(e)
@@ -63,14 +69,19 @@ def handle_requests_by_batch():
     try:
         while True:
             requests_batch = []
-
+            
             while not (
                 len(requests_batch) >= BATCH_SIZE  # or
                 # (len(requests_batch) > 0 #and time.time() - requests_batch[0]['time'] > BATCH_TIMEOUT)
             ):
                 try:
-                    requests_batch.append(
-                        requests_queue.get(timeout=CHECK_INTERVAL))
+                    #print("qsize and batch size")
+                    #print(requests_queue.qsize())
+                    #print(len(requests_batch))
+                    requests_batch.append(requests_queue.get(timeout=CHECK_INTERVAL))
+                    #print("append after qsize and batch size")
+                    #print(requests_queue.qsize())
+                    #print(len(requests_batch))
                 except Empty:
                     continue
 
@@ -81,9 +92,11 @@ def handle_requests_by_batch():
                     run(request["input"][0], request["input"]
                         [1], request["input"][2])
                 )
+            print('after run ')
 
             for request, output in zip(requests_batch, batch_outputs):
                 request["output"] = output
+                print('insert output')
 
     except Exception as e:
         while not requests_queue.empty():
@@ -97,15 +110,20 @@ threading.Thread(target=handle_requests_by_batch).start()
 
 @app.route("/")
 def main():
+    
     return render_template("index.html")
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        print(requests_queue.qsize())
-
-        if requests_queue.qsize() >= 1:
+        global signal
+        #print('request coming')
+        if signal !=0 :
+            print('too many Requests')
+            return jsonify({"message": "Too many requests"}),429
+        if requests_queue.qsize() >= 1 :
+            print('too many requests')
             return jsonify({"message": "Too Many Requests"}), 429
 
         input_file = request.files["source"]
@@ -121,19 +139,22 @@ def predict():
 
         req = {"input": [input_file, file_type, f_path]}
         requests_queue.put(req)
-
+        print(requests_queue.qsize())
+        print('push queue')
         # Thread output response
         while "output" not in req:
+            #print('sleep')
             time.sleep(CHECK_INTERVAL)
 
         if req["output"] == 500:
             return jsonify({"error": "Error! Please upload another file"}), 500
 
         result = req["output"]
-        # 여기서 나이 인종 값 정리해서 보내면 된다
+        #output check 
         print('result === ' + result)
         shutil.rmtree(f_path)
         array = result.split(",")
+        signal=0
         return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3]), 200
 
     except Exception as e:
