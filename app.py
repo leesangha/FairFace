@@ -35,8 +35,8 @@ def run(input_file, file_type, f_path):
     try:
         global signal
         signal = 1
-        print('run start')
-        print(requests_queue.qsize())
+        #print('run start')
+        #print(requests_queue.qsize())
         f_name = str(uuid.uuid4())
         save_path = f_path + '/' + f_name + '.jpg'
         file_name = f_name+'.jpg'
@@ -118,9 +118,9 @@ def main():
 def predict():
     try:
         global signal
-        print('request coming')
+        #print('request coming')
         if signal !=0 :
-            print('too many requests')
+            print('too many Requests')
             return jsonify({"message": "Too many requests"}),429
         if requests_queue.qsize() >= 1 :
             print('too many requests')
