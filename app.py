@@ -50,7 +50,7 @@ def run(input_file, file_type, f_path):
             arr = predidct_age_gender_race(
                 "test_outputs.csv", f_path, model_7, model_4)
             # 디렉토리에 jpg,png 또는 png하나 생김
-            print(arr)
+            # print(arr)
             return arr
 
     except Exception as e:
@@ -65,8 +65,7 @@ def handle_requests_by_batch():
             requests_batch = []
 
             while not (
-                len(requests_batch)
-                >= BATCH_SIZE  # or
+                len(requests_batch) >= BATCH_SIZE  # or
                 # (len(requests_batch) > 0 #and time.time() - requests_batch[0]['time'] > BATCH_TIMEOUT)
             ):
                 try:
@@ -104,7 +103,7 @@ def main():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # print(requests_queue.qsize())
+        print(requests_queue.qsize())
 
         if requests_queue.qsize() >= 1:
             return jsonify({"message": "Too Many Requests"}), 429
@@ -135,7 +134,6 @@ def predict():
         print('result === ' + result)
         shutil.rmtree(f_path)
         array = result.split(",")
-        print(array[0])
         return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3]), 200
 
     except Exception as e:
