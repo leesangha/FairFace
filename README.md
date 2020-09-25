@@ -1,3 +1,5 @@
+[![Run on Ainize](https://ainize.ai/images/run_on_ainize_button.svg)](https://ainize.web.app/redirect?git_repo=https://github.com/leesangha/FairFace)
+
 # FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age
 
 The paper: https://arxiv.org/abs/1908.04913
