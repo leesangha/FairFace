@@ -35,8 +35,6 @@ def run(input_file, file_type, f_path):
     try:
         global signal
         signal = 1
-        #print('run start')
-        #print(requests_queue.qsize())
         f_name = str(uuid.uuid4())
         save_path = f_path + '/' + f_name + '.jpg'
         file_name = f_name+'.jpg'
@@ -55,8 +53,6 @@ def run(input_file, file_type, f_path):
 
         arr = predidct_age_gender_race(
            "test_outputs.csv", f_path, model_7, model_4)
-        # print(arr)
-        #arr = ','.join(['east Asian','asia','male','10-18'])
         return arr
 
     except Exception as e:
@@ -73,7 +69,6 @@ def handle_requests_by_batch():
             
             while not (
                 len(requests_batch) >= BATCH_SIZE  # or
-                # (len(requests_batch) > 0 #and time.time() - requests_batch[0]['time'] > BATCH_TIMEOUT)
             ):
                 try:
                 
@@ -115,7 +110,6 @@ def main():
 def predict():
     try:
         global signal
-        #print('request coming')
         if signal !=0 :
             print('too many Requests')
             return jsonify({"message": "Too many requests"}),429
@@ -136,11 +130,9 @@ def predict():
 
         req = {"input": [input_file, file_type, f_path]}
         requests_queue.put(req)
-        #print(requests_queue.qsize())
         print('push queue')
         # Thread output response
         while "output" not in req:
-            #print('sleep')
             time.sleep(CHECK_INTERVAL)
 
         if req["output"] == 500:

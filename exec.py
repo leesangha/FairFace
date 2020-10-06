@@ -24,15 +24,5 @@ if __name__ == "__main__":
     output = predict.predidct_age_gender_race(
         "test_outputs.csv", SAVE_DETECTED_AT, model_7, model_4)
     # print('end')
-
-    """
-    f = open("test_outputs.csv", "r")
-    read = f.read()
-    split = read.split(",")
-    race = split[9]
-    race4 = split[10]
-    gender = split[11]
-    age = split[12]
-    """
     print(output)
     # print(arr)
