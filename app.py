@@ -61,6 +61,7 @@ def run(input_file, file_type, f_path):
 
     except Exception as e:
         print(e)
+        signal=0
         return 500
 # Queueing
 
@@ -75,13 +76,9 @@ def handle_requests_by_batch():
                 # (len(requests_batch) > 0 #and time.time() - requests_batch[0]['time'] > BATCH_TIMEOUT)
             ):
                 try:
-                    #print("qsize and batch size")
-                    #print(requests_queue.qsize())
-                    #print(len(requests_batch))
+                
                     requests_batch.append(requests_queue.get(timeout=CHECK_INTERVAL))
-                    #print("append after qsize and batch size")
-                    #print(requests_queue.qsize())
-                    #print(len(requests_batch))
+                    
                 except Empty:
                     continue
 
@@ -159,7 +156,7 @@ def predict():
 
     except Exception as e:
         print(e)
-
+        signal=0
         return jsonify({"message": "Error! Please upload another file"}), 400
 
 
