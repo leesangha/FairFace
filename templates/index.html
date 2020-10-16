@@ -16,7 +16,7 @@
   <div class="container">
     <div class="jumbotron mt-3">
       <h1>FairFace</h1>
-      <h3>Face Attribute Dataset for Balanced Race, Gender, and Age</h3>
+      <h3>Let me guess your age!!</h3>
       <a>GitHub repository : </a>
       <a href="https://github.com/leesangha/FairFace" target="blank">
         FairFace repo</a>
@@ -31,8 +31,22 @@
       <div id="exampleBox" style="margin-top: 5px; margin-bottom: 5px">
         <div id="exampleImage" style="margin-bottom: 15px">
           <h4>Image</h4>
-          <img id="eg_image" src="{{url_for('static', filename='example.png')}}"
-            style="max-width: 100%; max-height: 100%; max-width: 600px; max-height: 600px;" />
+          <img id="eg_image" src="{{url_for('static', filename='race_Middle_Eastern.jpg')}}"
+            style="max-width: 25%; max-height: 100%; max-width: 300px; max-height: 600px;" />
+          <img id="eg_image" src="{{url_for('static', filename='race_White.jpg')}}"
+            style="max-width: 25%; max-height: 100%; max-width: 300px; max-height: 600px;" />
+        </div>
+        <div style="display: flex;">
+          <img id="eg_image" src="{{url_for('static', filename='middle_output.png')}}"
+            style="max-width: 10%; max-height: 100%; max-width: 180px; margin-left: 6%" />
+          <img id="eg_image" src="{{url_for('static', filename='white_output.png')}}"
+            style="max-width: 10%; max-height: 100%; max-width: 180px; margin-left: 16%;" />
+        </div>
+        <div style="margin-top: 5px;">
+          <h4>Notes</h4>
+          <p>This model can detect only single face.</p>
+          <p>Race7 : ( White, Black, Latino_Hispanic, East, Southeast Asian, Indian, Middle Eastern )</p>
+          <p>Race4 : (White, Black, Asian , Indian)</p>
         </div>
       </div>
 
@@ -40,15 +54,12 @@
 
       <h2>How to Use</h2>
       <div id="usage" style="margin-top: 5px; margin-bottom: 5px">
-        <p>1. Name the image file in English or Numbers.</p>
         <p>
-          2. Upload the image file you want to convert.(Only one person , Not
-          multiple people)
+          1. Upload an image file you want to get its predictions of race, gender and age.
         </p>
-        <p>3. Press the Run button and wait for the result.</p>
-        <p>-sample file</p>
-        <img id="eg_image" src="{{url_for('static', filename='race_Black.jpg')}}"
-          style="max-width: 30%; max-height: 30%" />
+        <p>2. Press the Run button and wait for the result.<b>(20sec ~ 40sec)</b></p>
+        <img id="eg_image" src="{{url_for('static', filename='Black.jpg')}}"
+          style="max-width: 50%; max-height: 50%" />
       </div>
 
       <hr class="solid" />
@@ -76,6 +87,7 @@
           <div style="position: relative; width: 30%;">
             <div id="text" style="display: none;position: absolute; bottom: 0;left: 10%;">
               <div>
+                <div><b>FairFace Detection</b></div>
                 <div id="race7">Race7 :</div>
                 <div id="race4">Race4 :</div>
                 <div id="gender">Gender :</div>
