@@ -42,7 +42,6 @@ def run(input_file, file_type, f_path):
         imgs = [save_path]
         detect_face(imgs, f_path, cnn_face_detector, sp)
         print('detect_face end')
-        time.sleep(1)
         
         os.remove(save_path)  # 삭제
         if os.path.isfile(save_path):
@@ -62,7 +61,6 @@ def handle_requests_by_batch():
     try:
         while True:
             requests_batch = []
-            
             while not (
                 len(requests_batch) >= BATCH_SIZE  # or
             ):
@@ -71,16 +69,8 @@ def handle_requests_by_batch():
                 except Empty:
                     continue
 
-            batch_outputs = []
-
-            for request in requests_batch:
-                batch_outputs.append(
-                    run(request["input"][0], request["input"]
-                        [1], request["input"][2])
-                )
-
-            for request, output in zip(requests_batch, batch_outputs):
-                request["output"] = output
+                for request in requests_batch:
+                    request['output']=run(request['input'][0],request['input'][1],request['input'][2])
 
     except Exception as e:
         while not requests_queue.empty():
@@ -101,10 +91,12 @@ def main():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        if requests_queue.qsize() > 1 :
+        
+        if requests_queue.qsize() != 0 :
             print('too many requests')
             return jsonify({"message": "Too Many Requests"}), 429
-
+        print('current qsize')
+        print(requests_queue.qsize())
         input_file = request.files["source"]
         file_type = request.form["file_type"]
         if file_type == "image":
