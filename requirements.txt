@@ -1,7 +1,7 @@
 Flask==1.0.2
 torch==1.6.0
-torchvision
-numpy
+torchvision==0.7.0
+numpy==1.19.4
 waitress==1.4.4
-pandas
-Pillow
+pandas==0.25.1
+Pillow==8.0.1
