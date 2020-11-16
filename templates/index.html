@@ -22,7 +22,7 @@
         FairFace repo</a>
       <br />
       <a>Open API : </a>
-      <a href="https://master-Fairface-leesangha.endpoint.ainize.ai/" target="blank">
+      <a href="https://ainize.ai/leesangha/FairFace" target="blank">
         on Ainize
       </a>
 
@@ -58,8 +58,7 @@
           1. Upload an image file you want to get its predictions of race, gender and age.
         </p>
         <p>2. Press the Run button and wait for the result.<b>(20sec ~ 40sec)</b></p>
-        <img id="eg_image" src="{{url_for('static', filename='Black.jpg')}}"
-          style="max-width: 50%; max-height: 50%" />
+        <img id="eg_image" src="{{url_for('static', filename='Black.jpg')}}" style="max-width: 50%; max-height: 50%" />
       </div>
 
       <hr class="solid" />
@@ -215,8 +214,8 @@
           if (get_file) {
             reader.readAsDataURL(get_file[0]);
           }
-          image.style.maxHeight="400px";
-          image.style.maxWidth="400px";
+          image.style.maxHeight = "400px";
+          image.style.maxWidth = "400px";
           space.appendChild(image);
         });
 
@@ -248,9 +247,9 @@
           formData.append("source", source);
           formData.append("file_type", file_type);
           fetch("/predict", {
-            method: "POST",
-            body: formData,
-          })
+              method: "POST",
+              body: formData,
+            })
             .then(async (response) => {
               if (response.status == 200) {
                 return response;
@@ -279,7 +278,7 @@
               document.getElementById("errorbox").innerHTML = e;
               document.getElementById("submit").disabled = false;
               document.getElementById("source").disabled = false;
-              document.getElementById("text").style.display="none";
+              document.getElementById("text").style.display = "none";
             });
         };
       </script>
