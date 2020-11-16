@@ -1,8 +1,17 @@
-openapi: 3.0.1
+openapi: 3.0.0
 
 info:
   title: FairFace
-  description: "Face Attribute Dataset for Balanced Race, Gender, and Age"
+  description: |
+    Face Attribute Dataset for Balanced Race, Gender, and Age
+    You can test FairFace in open api or **[Web Server](https://master-fair-face-leesangha.endpoint.ainize.ai/)**.
+    ---
+
+      How to use :
+        *Prepare your face image.
+        *Upload an image file you want to get its predictions of race, gender and age.
+        *Press the Run button and wait for the result.
+
   contact:
     name: Ainizer - Sangha Lee
   version: "0.1"
@@ -42,7 +51,13 @@ paths:
               schema:
                 type: object
                 format: binary
-                example: {"age":"0-2","gender": "Male","race4":"Asian","race7":"East Asian"}
+                example:
+                  {
+                    "age": "0-2",
+                    "gender": "Male",
+                    "race4": "Asian",
+                    "race7": "East Asian",
+                  }
         "400":
           description: Bad Request
 
