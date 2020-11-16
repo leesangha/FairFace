@@ -23,7 +23,6 @@ model_4 = make_model4()
 requests_queue = Queue()
 BATCH_SIZE = 1
 CHECK_INTERVAL = 0.1
-signal =0
 ##################################################################
 # pre-train
 cnn_face_detector = dlib.cnn_face_detection_model_v1(
@@ -33,8 +32,6 @@ sp = dlib.shape_predictor('dlib_models/shape_predictor_5_face_landmarks.dat')
 
 def run(input_file, file_type, f_path):
     try:
-        global signal
-        signal = 1
         f_name = str(uuid.uuid4())
         save_path = f_path + '/' + f_name + '.jpg'
         file_name = f_name+'.jpg'
@@ -57,7 +54,6 @@ def run(input_file, file_type, f_path):
 
     except Exception as e:
         print(e)
-        signal=0
         return 500
 # Queueing
 
@@ -71,9 +67,7 @@ def handle_requests_by_batch():
                 len(requests_batch) >= BATCH_SIZE  # or
             ):
                 try:
-                
                     requests_batch.append(requests_queue.get(timeout=CHECK_INTERVAL))
-                    
                 except Empty:
                     continue
 
@@ -84,11 +78,9 @@ def handle_requests_by_batch():
                     run(request["input"][0], request["input"]
                         [1], request["input"][2])
                 )
-            print('after run ')
 
             for request, output in zip(requests_batch, batch_outputs):
                 request["output"] = output
-                print('insert output')
 
     except Exception as e:
         while not requests_queue.empty():
@@ -109,11 +101,7 @@ def main():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        global signal
-        if signal !=0 :
-            print('too many Requests')
-            return jsonify({"message": "Too many requests"}),429
-        if requests_queue.qsize() >= 1 :
+        if requests_queue.qsize() > 1 :
             print('too many requests')
             return jsonify({"message": "Too Many Requests"}), 429
 
@@ -143,12 +131,10 @@ def predict():
         print('result === ' + result)
         shutil.rmtree(f_path)
         array = result.split(",")
-        signal=0
         return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3]), 200
 
     except Exception as e:
         print(e)
-        signal=0
         return jsonify({"message": "Error! Please upload another file"}), 400
 
 
