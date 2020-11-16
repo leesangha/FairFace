@@ -41,7 +41,7 @@ def run(input_file, file_type, f_path):
         # Run model
         imgs = [save_path]
         detect_face(imgs, f_path, cnn_face_detector, sp)
-        print('detect_face end')
+        #print('detect_face end')
         
         os.remove(save_path)  # 삭제
         if os.path.isfile(save_path):
@@ -95,8 +95,8 @@ def predict():
         if requests_queue.qsize() != 0 :
             print('too many requests')
             return jsonify({"message": "Too Many Requests"}), 429
-        print('current qsize')
-        print(requests_queue.qsize())
+        #print('current qsize')
+        #print(requests_queue.qsize())
         input_file = request.files["source"]
         file_type = request.form["file_type"]
         if file_type == "image":
@@ -110,7 +110,7 @@ def predict():
 
         req = {"input": [input_file, file_type, f_path]}
         requests_queue.put(req)
-        print('push queue')
+        #print('push queue')
         # Thread output response
         while "output" not in req:
             time.sleep(CHECK_INTERVAL)
@@ -120,7 +120,7 @@ def predict():
 
         result = req["output"]
         #output check 
-        print('result === ' + result)
+        print(result)
         shutil.rmtree(f_path)
         array = result.split(",")
         return jsonify(race7=array[0], race4=array[1], gender=array[2], age=array[3]), 200
@@ -130,9 +130,9 @@ def predict():
         return jsonify({"message": "Error! Please upload another file"}), 400
 
 
-@app.route("/health")
+@app.route("/health",methods=["GET"])
 def health():
-    return res.sendStatus(200)
+    return "ok",200
 
 
 if __name__ == "__main__":
